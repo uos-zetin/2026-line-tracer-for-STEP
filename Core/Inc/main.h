@@ -60,24 +60,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ADC_PT_0_Pin GPIO_PIN_0
-#define ADC_PT_0_GPIO_Port GPIOC
-#define ADC_PT_1_Pin GPIO_PIN_1
-#define ADC_PT_1_GPIO_Port GPIOC
-#define ADC_PT_2_Pin GPIO_PIN_2
-#define ADC_PT_2_GPIO_Port GPIOC
-#define ADC_PT_3_Pin GPIO_PIN_3
-#define ADC_PT_3_GPIO_Port GPIOC
-#define ADC_PT_4_Pin GPIO_PIN_0
-#define ADC_PT_4_GPIO_Port GPIOA
-#define ADC_PT_5_Pin GPIO_PIN_1
-#define ADC_PT_5_GPIO_Port GPIOA
-#define ADC_PT_6_Pin GPIO_PIN_6
-#define ADC_PT_6_GPIO_Port GPIOA
+#define ADC_PT_7_Pin GPIO_PIN_0
+#define ADC_PT_7_GPIO_Port GPIOC
+#define ADC_PT_6_Pin GPIO_PIN_1
+#define ADC_PT_6_GPIO_Port GPIOC
+#define ADC_PT_5_Pin GPIO_PIN_2
+#define ADC_PT_5_GPIO_Port GPIOC
+#define ADC_PT_4_Pin GPIO_PIN_3
+#define ADC_PT_4_GPIO_Port GPIOC
+#define ADC_PT_3_Pin GPIO_PIN_0
+#define ADC_PT_3_GPIO_Port GPIOA
+#define ADC_PT_2_Pin GPIO_PIN_1
+#define ADC_PT_2_GPIO_Port GPIOA
+#define ADC_PT_1_Pin GPIO_PIN_6
+#define ADC_PT_1_GPIO_Port GPIOA
 #define MTR_R1_Pin GPIO_PIN_7
 #define MTR_R1_GPIO_Port GPIOA
-#define ADC_PT_7_Pin GPIO_PIN_4
-#define ADC_PT_7_GPIO_Port GPIOC
+#define ADC_PT_0_Pin GPIO_PIN_4
+#define ADC_PT_0_GPIO_Port GPIOC
 #define MTR_L4_Pin GPIO_PIN_5
 #define MTR_L4_GPIO_Port GPIOC
 #define MTR_L2_Pin GPIO_PIN_0

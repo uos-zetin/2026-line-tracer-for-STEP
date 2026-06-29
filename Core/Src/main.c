@@ -30,13 +30,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "st7735_lcd.h"
+
 #include "button.h"
 #include "menu.h"
+#include "sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define LCD_Printf LCD7735_Printf
 
 /* USER CODE END PTD */
 
@@ -135,11 +136,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 
-	LCD7735_Test();
-
+	LCD_Test();
+	Sensor_Start();
 	LCD_Printf(0, 0, "Hello world~");
 	while (1) {
-		Main_Menu();
+//		Main_Menu();
+		Sensor_Test_Raw();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

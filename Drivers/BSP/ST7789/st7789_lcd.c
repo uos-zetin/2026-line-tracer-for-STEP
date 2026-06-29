@@ -1,5 +1,5 @@
 #include "st7789.h"
-#include "st7789_lcd.h"
+#include "st7789_LCD.h"
 #include "spi.h"
 #include "lptim.h"
 #include "fonts.h"
@@ -24,21 +24,21 @@
 #define LCD_Brightness_timer &hlptim1
 #define LCD_Brightness_channel LPTIM_CHANNEL_2
 
-static int32_t lcd7789_init(void);
-static int32_t lcd7789_gettick(void);
-static int32_t lcd7789_writereg(uint8_t reg, uint8_t *pdata, uint32_t length);
-static int32_t lcd7789_readreg(uint8_t reg, uint8_t *pdata);
-static int32_t lcd7789_senddata(uint8_t *pdata, uint32_t length);
-static int32_t lcd7789_recvdata(uint8_t *pdata, uint32_t length);
+static int32_t LCD_init(void);
+static int32_t LCD_gettick(void);
+static int32_t LCD_writereg(uint8_t reg, uint8_t *pdata, uint32_t length);
+static int32_t LCD_readreg(uint8_t reg, uint8_t *pdata);
+static int32_t LCD_senddata(uint8_t *pdata, uint32_t length);
+static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length);
 
-uint16_t LCD7789_BACK_BRIGHT = 600;
+uint16_t LCD_BACK_BRIGHT = 600;
 
-ST7789_IO_t st7789_pIO = { lcd7789_init, 0, 0, lcd7789_writereg,
-		lcd7789_readreg, lcd7789_senddata, lcd7789_recvdata, lcd7789_gettick };
+ST7789_IO_t st7789_pIO = { LCD_init, 0, 0, LCD_writereg,
+		LCD_readreg, LCD_senddata, LCD_recvdata, LCD_gettick };
 
 ST7789_Object_t st7789_pObj;
 
-void LCD7789_Test(void) {
+void LCD_Test(void) {
 
 #if defined(TFT135x240)
 	ST7789Ctx.Orientation = ST7789_ORIENTATION_LANDSCAPE;
@@ -58,9 +58,9 @@ void LCD7789_Test(void) {
 	ST7789_SetBrightness(&st7789_pObj, 0);
 
 	// SD 카드 대신 동작 확인용 텍스트 출력
-	LCD7789_Printf(0, 0, "ST7789 Init OK!");
-	LCD7789_Printf(0, 1, "SD Card: Disabled");
-	LCD7789_Printf(0, 3, "Running Fade Test...");
+	LCD_Printf(0, 0, "ST7789 Init OK!");
+	LCD_Printf(0, 1, "SD Card: Disabled");
+	LCD_Printf(0, 3, "Running Fade Test...");
 
 	uint32_t tick = get_tick();
 
@@ -70,9 +70,9 @@ void LCD7789_Test(void) {
 		uint32_t elapsed = get_tick() - tick;
 
 		if (elapsed <= 1000) {
-			LCD7789_SetBrightness(elapsed * LCD7789_BACK_BRIGHT / 1000);
+			LCD_SetBrightness(elapsed * LCD_BACK_BRIGHT / 1000);
 		} else if (elapsed <= 3000) {
-			LCD7789_SetBrightness(LCD7789_BACK_BRIGHT);
+			LCD_SetBrightness(LCD_BACK_BRIGHT);
 			ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, ST7789Ctx.Height - 5,
 					(elapsed - 1000) * ST7789Ctx.Width / 2000, 5, 0xFFFF);
 		} else if (elapsed > 3000) {
@@ -81,38 +81,38 @@ void LCD7789_Test(void) {
 	}
 
 	// 1번 깜빡이는 효과 후 메인루프로 진행
-	LCD7789_Light(0, 300);
+	LCD_Light(0, 300);
 	ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, 0, ST7789Ctx.Width, ST7789Ctx.Height, BLACK);
-	LCD7789_Light(LCD7789_BACK_BRIGHT, 300);
+	LCD_Light(LCD_BACK_BRIGHT, 300);
 }
 
-static uint32_t LCD7789_LightSet;
-static uint8_t IsLCD7789_SoftPWM = 0;
+static uint32_t LCD_LightSet;
+static uint8_t IsLCD_SoftPWM = 0;
 
-void LCD7789_SetBrightness(uint32_t Brightness) {
-	LCD7789_LightSet = Brightness;
-	if (!IsLCD7789_SoftPWM)
+void LCD_SetBrightness(uint32_t Brightness) {
+	LCD_LightSet = Brightness;
+	if (!IsLCD_SoftPWM)
 		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
 }
 
-uint32_t LCD7789_GetBrightness(void) {
-	if (IsLCD7789_SoftPWM)
-		return LCD7789_LightSet;
+uint32_t LCD_GetBrightness(void) {
+	if (IsLCD_SoftPWM)
+		return LCD_LightSet;
 	else
 		return (*LCD_Brightness_timer).Instance->CCR2;
 }
 
-void LCD7789_SoftPWMEnable(uint8_t enable) {
-	IsLCD7789_SoftPWM = enable;
+void LCD_SoftPWMEnable(uint8_t enable) {
+	IsLCD_SoftPWM = enable;
 	if (!enable)
-		LCD7789_SetBrightness(LCD7789_LightSet);
+		LCD_SetBrightness(LCD_LightSet);
 }
 
-//uint8_t LCD7789_SoftPWMIsEnable(void) {
-//	return IsLCD7789_SoftPWM;
+//uint8_t LCD_SoftPWMIsEnable(void) {
+//	return IsLCD_SoftPWM;
 //}
 
-//void LCD7789_SoftPWMCtrlInit(void) {
+//void LCD_SoftPWMCtrlInit(void) {
 //	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 //	__HAL_RCC_GPIOE_CLK_ENABLE();
 //	GPIO_InitStruct.Pin = GPIO_PIN_10;
@@ -121,33 +121,33 @@ void LCD7789_SoftPWMEnable(uint8_t enable) {
 //	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 //	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 //
-//	LCD7789_SoftPWMEnable(1);
+//	LCD_SoftPWMEnable(1);
 //}
 //
-//void LCD7789_SoftPWMCtrlDeInit(void) {
+//void LCD_SoftPWMCtrlDeInit(void) {
 //	HAL_GPIO_DeInit(GPIOE, GPIO_PIN_10);
 //}
 //
-//void LCD7789_SoftPWMCtrlRun(void) {
+//void LCD_SoftPWMCtrlRun(void) {
 //	static uint32_t timecount;
 //	if (timecount > 1000)
 //		timecount = 0;
 //	else
 //		timecount += 10;
 //
-//	if (timecount >= LCD7789_LightSet)
+//	if (timecount >= LCD_LightSet)
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
 //	else
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
 //}
 
-void LCD7789_Light(uint32_t Brightness_Dis, uint32_t time) {
+void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
 	float temp1, temp2;
 	float k, set;
 
-	Brightness_Now = LCD7789_GetBrightness();
+	Brightness_Now = LCD_GetBrightness();
 	time_now = 0;
 	if (Brightness_Now == Brightness_Dis)
 		return;
@@ -168,20 +168,20 @@ void LCD7789_Light(uint32_t Brightness_Dis, uint32_t time) {
 		time_now = get_tick() - tick;
 		temp2 = time_now - 0;
 		set = temp2 * k + Brightness_Now;
-		LCD7789_SetBrightness((uint32_t) set);
+		LCD_SetBrightness((uint32_t) set);
 		if (time_now >= time)
 			break;
 	}
 }
 
-uint16_t LCD7789_POINT_COLOR = 0xFFFF;
-uint16_t LCD7789_BACK_COLOR = BLACK;
+uint16_t LCD_POINT_COLOR = 0xFFFF;
+uint16_t LCD_BACK_COLOR = BLACK;
 
-void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
+void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
 	uint8_t temp, t1, t;
 	uint16_t y0 = y;
 	uint16_t x0 = x;
-	uint16_t colortemp = LCD7789_POINT_COLOR;
+	uint16_t colortemp = LCD_POINT_COLOR;
 	uint32_t h, w;
 
 	uint16_t write[size][size == 12 ? 6 : 8];
@@ -202,11 +202,11 @@ void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					LCD7789_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
+					LCD_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
 				else
-					LCD7789_POINT_COLOR = (LCD7789_BACK_COLOR & 0xFF) << 8 | LCD7789_BACK_COLOR >> 8;
+					LCD_POINT_COLOR = (LCD_BACK_COLOR & 0xFF) << 8 | LCD_BACK_COLOR >> 8;
 
-				write[count][t / 2] = LCD7789_POINT_COLOR;
+				write[count][t / 2] = LCD_POINT_COLOR;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -214,14 +214,14 @@ void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp <<= 1;
 				y++;
 				if (y > h) {
-					LCD7789_POINT_COLOR = colortemp;
+					LCD_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD7789_POINT_COLOR = colortemp;
+						LCD_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -236,7 +236,7 @@ void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp = asc2_1608[num][t];
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					write[count][t / 2] = (LCD7789_POINT_COLOR & 0xFF) << 8 | LCD7789_POINT_COLOR >> 8;
+					write[count][t / 2] = (LCD_POINT_COLOR & 0xFF) << 8 | LCD_POINT_COLOR >> 8;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -244,14 +244,14 @@ void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp <<= 1;
 				y++;
 				if (y > h) {
-					LCD7789_POINT_COLOR = colortemp;
+					LCD_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD7789_POINT_COLOR = colortemp;
+						LCD_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -260,10 +260,10 @@ void LCD7789_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 		}
 	}
 	ST7789_FillRGBRect(&st7789_pObj, x0, y0, (uint8_t*) &write, size == 12 ? 6 : 8, size);
-	LCD7789_POINT_COLOR = colortemp;
+	LCD_POINT_COLOR = colortemp;
 }
 
-void LCD7789_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
+void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
 	uint8_t x0 = x;
 	width += x;
 	height += y;
@@ -274,13 +274,13 @@ void LCD7789_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
 		}
 		if (y > height)
 			break;
-		LCD7789_ShowChar(x, y, *p, size, 0);
+		LCD_ShowChar(x, y, *p, size, 0);
 		x += size / 2;
 		p++;
 	}
 }
 
-void LCD7789_Printf(uint16_t x, uint16_t y, const char *text, ...) {
+void LCD_Printf(uint16_t x, uint16_t y, const char *text, ...) {
 	char txt[512] = { 0 };
 	va_list args;
 	va_start(args, text);
@@ -307,21 +307,21 @@ void LCD7789_Printf(uint16_t x, uint16_t y, const char *text, ...) {
 		offset_y = 0;
 	}
 
-	LCD7789_ShowString(x_bias * x + offset_x, y_bias * y + offset_y,
+	LCD_ShowString(x_bias * x + offset_x, y_bias * y + offset_y,
 			ST7789Ctx.Width - x, ST7789Ctx.Height - y, fixed_size,
 			(uint8_t*) txt);
 }
 
-static int32_t lcd7789_init(void) {
+static int32_t LCD_init(void) {
 	HAL_LPTIM_PWM_Start(LCD_Brightness_timer, LCD_Brightness_channel);
 	return ST7789_OK;
 }
 
-static int32_t lcd7789_gettick(void) {
+static int32_t LCD_gettick(void) {
 	return HAL_GetTick();
 }
 
-static int32_t lcd7789_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
+static int32_t LCD_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
 	int32_t result;
 	LCD_CS_RESET;
 	LCD_RS_RESET;
@@ -345,7 +345,7 @@ static int32_t lcd7789_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
 	return result > 0 ? -1 : 0;
 }
 
-static int32_t lcd7789_readreg(uint8_t reg, uint8_t *pdata) {
+static int32_t LCD_readreg(uint8_t reg, uint8_t *pdata) {
 	int32_t result;
 	LCD_CS_RESET;
 	LCD_RS_RESET;
@@ -359,7 +359,7 @@ static int32_t lcd7789_readreg(uint8_t reg, uint8_t *pdata) {
 	return result > 0 ? -1 : 0;
 }
 
-static int32_t lcd7789_senddata(uint8_t *pdata, uint32_t length) {
+static int32_t LCD_senddata(uint8_t *pdata, uint32_t length) {
 	LCD_CS_RESET;
 	uint32_t remaining = length;
 	uint8_t *ptr = pdata;
@@ -375,7 +375,7 @@ static int32_t lcd7789_senddata(uint8_t *pdata, uint32_t length) {
 	return 0;
 }
 
-static int32_t lcd7789_recvdata(uint8_t *pdata, uint32_t length) {
+static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length) {
 	LCD_CS_RESET;
 	uint32_t remaining = length;
 	uint8_t *ptr = pdata;
@@ -391,14 +391,14 @@ static int32_t lcd7789_recvdata(uint8_t *pdata, uint32_t length) {
 	return 0;
 }
 
-void LCD7789_Clear() {
-	LCD7789_Light(0, 250);
+void LCD_Clear() {
+	LCD_Light(0, 250);
 	ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, 0, ST7789Ctx.Width,
 			ST7789Ctx.Height, BLACK);
-	LCD7789_Light(900, 250);
+	LCD_Light(900, 250);
 }
 
-void LCD7789_Set_Color(uint16_t point, uint16_t back) {
-	LCD7789_POINT_COLOR = point;
-	LCD7789_BACK_COLOR = back;
+void LCD_Set_Color(uint16_t point, uint16_t back) {
+	LCD_POINT_COLOR = point;
+	LCD_BACK_COLOR = back;
 }

@@ -26,22 +26,22 @@
 extern ST7735_Object_t st7735_pObj;
 extern uint32_t st7735_id;
 
-extern uint16_t LCD7735_POINT_COLOR;
-extern uint16_t LCD7735_BACK_COLOR;
-extern uint16_t LCD7735_BACK_BRIGHT;
+extern uint16_t LCD_POINT_COLOR;
+extern uint16_t LCD_BACK_COLOR;
+extern uint16_t LCD_BACK_BRIGHT;
 
-void LCD7735_Test(void);
-void LCD7735_SetBrightness(uint32_t Brightness);
-uint32_t LCD7735_GetBrightness(void);
-void LCD7735_SoftPWMEnable(uint8_t enable);
-uint8_t LCD7735_SoftPWMIsEnable(void);
-void LCD7735_SoftPWMCtrlInit(void);
-void LCD7735_SoftPWMCtrlDeInit(void);
-void LCD7735_SoftPWMCtrlRun(void);
-void LCD7735_Light(uint32_t Brightness_Dis, uint32_t time);
-void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode);
-void LCD7735_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p);
-void LCD7735_Clear(void);
-void LCD7735_Printf(uint8_t x, uint8_t y, const char *text, ...);
+void LCD_Test(void);
+void LCD_SetBrightness(uint32_t Brightness);
+uint32_t LCD_GetBrightness(void);
+void LCD_SoftPWMEnable(uint8_t enable);
+uint8_t LCD_SoftPWMIsEnable(void);
+void LCD_SoftPWMCtrlInit(void);
+void LCD_SoftPWMCtrlDeInit(void);
+void LCD_SoftPWMCtrlRun(void);
+void LCD_Light(uint32_t Brightness_Dis, uint32_t time);
+void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode);
+void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p);
+void LCD_Clear(void);
+void LCD_Printf(uint8_t x, uint8_t y, const char *text, ...);
 
 #endif /* __ST7735_LCD_H */

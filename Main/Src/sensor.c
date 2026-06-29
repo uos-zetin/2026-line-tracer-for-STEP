@@ -6,6 +6,7 @@
  */
 
 #include "sensor.h"
+#include "st7735_lcd.h"
 #include "gpio.h"
 #include "main.h"
 #include "adc.h"
@@ -16,9 +17,8 @@
 #define TIM_SENSOR	&htim3
 #define ADC_SENSOR	&hadc1
 
-#define IR_IRQ_Handler HAL_TIM6_IRQ_Handler
+#define TIM_IR_IRQ_Handler HAL_TIM6_IRQ_Handler
 #define SENSOR_IRQ_Handler HAL_ADC1_IRQ_Handler
-
 
 typedef struct {
 	GPIO_TypeDef *Port;
@@ -37,35 +37,38 @@ typedef struct {
 
 IR_DATA irData;
 
-IR_TypeDef IR_Index[SENSOR_NUM] = {
-		{.Port = IR_0_GPIO_Port, .Pin = IR_0_Pin},
-		{.Port = IR_1_GPIO_Port, .Pin = IR_1_Pin},
-		{.Port = IR_2_GPIO_Port, .Pin = IR_2_Pin},
-		{.Port = IR_3_GPIO_Port, .Pin = IR_3_Pin},
-		{.Port = IR_4_GPIO_Port, .Pin = IR_4_Pin},
-		{.Port = IR_5_GPIO_Port, .Pin = IR_5_Pin},
-		{.Port = IR_6_GPIO_Port, .Pin = IR_6_Pin},
-		{.Port = IR_7_GPIO_Port, .Pin = IR_7_Pin},
-};
+IR_TypeDef IR_Index[SENSOR_NUM] = { { .Port = IR_0_GPIO_Port, .Pin = IR_0_Pin },
+		{ .Port = IR_1_GPIO_Port, .Pin = IR_1_Pin }, { .Port = IR_2_GPIO_Port,
+				.Pin = IR_2_Pin }, { .Port = IR_3_GPIO_Port, .Pin = IR_3_Pin },
+		{ .Port = IR_4_GPIO_Port, .Pin = IR_4_Pin }, { .Port = IR_5_GPIO_Port,
+				.Pin = IR_5_Pin }, { .Port = IR_6_GPIO_Port, .Pin = IR_6_Pin },
+		{ .Port = IR_7_GPIO_Port, .Pin = IR_7_Pin }, };
 
-__STATIC_INLINE void IR_Enable(uint8_t idx){
-	HAL_GPIO_WritePin((IR_Index + idx)->Port, (IR_Index + idx)->Pin, GPIO_PIN_SET);
+volatile uint32_t tim6_cnt = 0;
+volatile uint32_t adc_cnt = 0;
+
+__STATIC_INLINE void IR_Enable(uint8_t idx) {
+	HAL_GPIO_WritePin((IR_Index + idx)->Port, (IR_Index + idx)->Pin,
+			GPIO_PIN_SET);
 }
 
-__STATIC_INLINE void IR_Disable(uint8_t idx){
-	HAL_GPIO_WritePin((IR_Index + idx)->Port, (IR_Index + idx)->Pin, GPIO_PIN_RESET);
+__STATIC_INLINE void IR_Disable(uint8_t idx) {
+	HAL_GPIO_WritePin((IR_Index + idx)->Port, (IR_Index + idx)->Pin,
+			GPIO_PIN_RESET);
 }
 
-void TIM_IR_IRQ_Handler(){
+void TIM_IR_IRQ_Handler() {
 	IR_Enable(irData.index);
 	__HAL_TIM_SET_COUNTER(TIM_SENSOR, 0);
 	__HAL_TIM_CLEAR_FLAG(TIM_SENSOR, TIM_FLAG_UPDATE);
 	__HAL_TIM_ENABLE(TIM_SENSOR);
+	tim6_cnt++;
+//	HAL_ADC_Start(ADC_SENSOR);
 }
 
-void IR_IRQ_Handler() {
+void SENSOR_IRQ_Handler() {
 	uint8_t idx = irData.index;
-
+	adc_cnt++;
 	uint16_t adc_raw = HAL_ADC_GetValue(ADC_SENSOR);
 	IR_Disable(irData.index);
 
@@ -76,15 +79,16 @@ void IR_IRQ_Handler() {
 	irData.index = (irData.index + 1) & 0x07;
 }
 
-void Sensor_Start(){
+void Sensor_Start() {
 	HAL_ADCEx_Calibration_Start(ADC_SENSOR, ADC_SINGLE_ENDED);
-	HAL_ADC_Start(ADC_SENSOR);
+	HAL_ADC_Start_IT(ADC_SENSOR);
 	HAL_Delay(10);
 	irData.index = 0;
+	__HAL_TIM_CLEAR_FLAG(TIM_IR, TIM_FLAG_UPDATE);
 	HAL_TIM_Base_Start_IT(TIM_IR);
 }
 
-void Sensor_Stop(){
+void Sensor_Stop() {
 	HAL_TIM_Base_Stop_IT(TIM_IR);
 	HAL_ADC_Stop(ADC_SENSOR);
 }
@@ -94,7 +98,12 @@ void Sensor_Calibration() {
 }
 
 void Sensor_Test_Raw() {
-
+	while (1) {
+		LCD_Printf(0, 1, "%02x %02x %02x %02x %02x %02x %02x %02x",
+				irData.sensorRaw[0], irData.sensorRaw[1], irData.sensorRaw[2],
+				irData.sensorRaw[3], irData.sensorRaw[4], irData.sensorRaw[5],
+				irData.sensorRaw[6], irData.sensorRaw[7]);
+	}
 }
 
 void Sensor_Test_Normalized() {

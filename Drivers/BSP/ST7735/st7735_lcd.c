@@ -1,5 +1,5 @@
 #include "st7735.h"
-#include "st7735_lcd.h"
+#include "st7735_LCD.h"
 #include "font.h"
 #include "spi.h"
 #include "lptim.h"
@@ -31,22 +31,22 @@
 #define LCD_Brightness_timer &hlptim1
 #define LCD_Brightness_channel LPTIM_CHANNEL_2
 
-static int32_t lcd7735_init(void);
-static int32_t lcd7735_gettick(void);
-static int32_t lcd7735_writereg(uint8_t reg, uint8_t *pdata, uint32_t length);
-static int32_t lcd7735_readreg(uint8_t reg, uint8_t *pdata);
-static int32_t lcd7735_senddata(uint8_t *pdata, uint32_t length);
-static int32_t lcd7735_recvdata(uint8_t *pdata, uint32_t length);
+static int32_t LCD_init(void);
+static int32_t LCD_gettick(void);
+static int32_t LCD_writereg(uint8_t reg, uint8_t *pdata, uint32_t length);
+static int32_t LCD_readreg(uint8_t reg, uint8_t *pdata);
+static int32_t LCD_senddata(uint8_t *pdata, uint32_t length);
+static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length);
 
-uint16_t LCD7735_BACK_BRIGHT = 600;
+uint16_t LCD_BACK_BRIGHT = 600;
 
-ST7735_IO_t st7735_pIO = { lcd7735_init,
-0, 0, lcd7735_writereg, lcd7735_readreg, lcd7735_senddata, lcd7735_recvdata, lcd7735_gettick };
+ST7735_IO_t st7735_pIO = { LCD_init,
+0, 0, LCD_writereg, LCD_readreg, LCD_senddata, LCD_recvdata, LCD_gettick };
 
 ST7735_Object_t st7735_pObj;
 uint32_t st7735_id;
 
-void LCD7735_Test(void) {
+void LCD_Test(void) {
 	uint8_t text[20];
 
 #if defined(TFT96)
@@ -65,19 +65,19 @@ void LCD7735_Test(void) {
 	ST7735_LCD_Driver.Init(&st7735_pObj, ST7735_FORMAT_RBG565, &ST7735Ctx);
 	ST7735_LCD_Driver.ReadID(&st7735_pObj, &st7735_id);
 
-	LCD7735_SetBrightness(0);
+	LCD_SetBrightness(0);
 
-	LCD7735_Clear();
+	LCD_Clear();
 
 	uint32_t tick = get_tick();
 	while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) != GPIO_PIN_SET) {
 		delay_ms(10);
 
 		if (get_tick() - tick <= 1000)
-			LCD7735_SetBrightness((get_tick() - tick) * LCD7735_BACK_BRIGHT / 1000);
+			LCD_SetBrightness((get_tick() - tick) * LCD_BACK_BRIGHT / 1000);
 		else if (get_tick() - tick <= 3000) {
 			sprintf((char*) &text, "%03ld", (get_tick() - tick - 1000) / 10);
-			LCD7735_ShowString(ST7735Ctx.Width - 20, 1, ST7735Ctx.Width, 12, 12, text);
+			LCD_ShowString(ST7735Ctx.Width - 20, 1, ST7735Ctx.Width, 12, 12, text);
 			ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, ST7735Ctx.Height - 3,
 					(get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3, 0xFFFF);
 		} else if (get_tick() - tick > 3000)
@@ -86,37 +86,37 @@ void LCD7735_Test(void) {
 	while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) == GPIO_PIN_SET) {
 		delay_ms(10);
 	}
-	LCD7735_Light(0, 300);
+	LCD_Light(0, 300);
 
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
 
-	LCD7735_Light(LCD7735_BACK_BRIGHT, 300);
+	LCD_Light(LCD_BACK_BRIGHT, 300);
 }
 
-static uint32_t LCD7735_LightSet;
-static uint8_t IsLCD7735_SoftPWM = 0;
+static uint32_t LCD_LightSet;
+static uint8_t IsLCD_SoftPWM = 0;
 
-void LCD7735_SetBrightness(uint32_t Brightness) {
-	LCD7735_LightSet = Brightness;
-	if (!IsLCD7735_SoftPWM)
+void LCD_SetBrightness(uint32_t Brightness) {
+	LCD_LightSet = Brightness;
+	if (!IsLCD_SoftPWM)
 		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
 }
 
-uint32_t LCD7735_GetBrightness(void) {
-	if (IsLCD7735_SoftPWM)
-		return LCD7735_LightSet;
+uint32_t LCD_GetBrightness(void) {
+	if (IsLCD_SoftPWM)
+		return LCD_LightSet;
 	else
 		return (*LCD_Brightness_timer).Instance->CCR2;
 }
 
-void LCD7735_SoftPWMEnable(uint8_t enable) {
-	IsLCD7735_SoftPWM = enable;
+void LCD_SoftPWMEnable(uint8_t enable) {
+	IsLCD_SoftPWM = enable;
 	if (!enable)
-		LCD7735_SetBrightness(LCD7735_LightSet);
+		LCD_SetBrightness(LCD_LightSet);
 }
 //
-//void LCD7735_SoftPWMCtrlInit(void) {
+//void LCD_SoftPWMCtrlInit(void) {
 //	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 //
 //	__HAL_RCC_GPIOE_CLK_ENABLE();
@@ -129,15 +129,15 @@ void LCD7735_SoftPWMEnable(uint8_t enable) {
 //	MX_TIM16_Init(); // Freq: 10K
 //	HAL_TIM_Base_Start_IT(&htim16);
 //
-//	LCD7735_SoftPWMEnable(1);
+//	LCD_SoftPWMEnable(1);
 //}
 //
-//void LCD7735_SoftPWMCtrlDeInit(void) {
+//void LCD_SoftPWMCtrlDeInit(void) {
 //	HAL_TIM_Base_DeInit(&htim16);
 //	HAL_GPIO_DeInit(GPIOE, GPIO_PIN_10);
 //}
 //
-//void LCD7735_SoftPWMCtrlRun(void) {
+//void LCD_SoftPWMCtrlRun(void) {
 //	static uint32_t timecount;
 //
 //	if (timecount > 1000)
@@ -145,7 +145,7 @@ void LCD7735_SoftPWMEnable(uint8_t enable) {
 //	else
 //		timecount += 10;
 //
-//	if (timecount >= LCD7735_LightSet)
+//	if (timecount >= LCD_LightSet)
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
 //	else
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
@@ -156,17 +156,17 @@ void LCD7735_SoftPWMEnable(uint8_t enable) {
  */
 // void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 // 	if (htim->Instance == TIM16) {
-// 		LCD7735_SoftPWMCtrlRun();
+// 		LCD_SoftPWMCtrlRun();
 // 	}
 // }
 
-void LCD7735_Light(uint32_t Brightness_Dis, uint32_t time) {
+void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
 	float temp1, temp2;
 	float k, set;
 
-	Brightness_Now = LCD7735_GetBrightness();
+	Brightness_Now = LCD_GetBrightness();
 	time_now = 0;
 	if (Brightness_Now == Brightness_Dis)
 		return;
@@ -187,20 +187,20 @@ void LCD7735_Light(uint32_t Brightness_Dis, uint32_t time) {
 		time_now = get_tick() - tick;
 		temp2 = time_now - 0;
 		set = temp2 * k + Brightness_Now;
-		LCD7735_SetBrightness((uint32_t) set);
+		LCD_SetBrightness((uint32_t) set);
 		if (time_now >= time)
 			break;
 	}
 }
 
-uint16_t LCD7735_POINT_COLOR = 0xFFFF;
-uint16_t LCD7735_BACK_COLOR = BLACK;
+uint16_t LCD_POINT_COLOR = 0xFFFF;
+uint16_t LCD_BACK_COLOR = BLACK;
 
-void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
+void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
 	uint8_t temp, t1, t;
 	uint16_t y0 = y;
 	uint16_t x0 = x;
-	uint16_t colortemp = LCD7735_POINT_COLOR;
+	uint16_t colortemp = LCD_POINT_COLOR;
 	uint32_t h, w;
 
 	uint16_t write[size][size == 12 ? 6 : 8];
@@ -221,11 +221,11 @@ void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					LCD7735_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
+					LCD_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
 				else
-					LCD7735_POINT_COLOR = (LCD7735_BACK_COLOR & 0xFF) << 8 | LCD7735_BACK_COLOR >> 8;
+					LCD_POINT_COLOR = (LCD_BACK_COLOR & 0xFF) << 8 | LCD_BACK_COLOR >> 8;
 
-				write[count][t / 2] = LCD7735_POINT_COLOR;
+				write[count][t / 2] = LCD_POINT_COLOR;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -233,14 +233,14 @@ void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp <<= 1;
 				y++;
 				if (y >= h) {
-					LCD7735_POINT_COLOR = colortemp;
+					LCD_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD7735_POINT_COLOR = colortemp;
+						LCD_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -255,7 +255,7 @@ void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp = asc2_1608[num][t];
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					write[count][t / 2] = (LCD7735_POINT_COLOR & 0xFF) << 8 | LCD7735_POINT_COLOR >> 8;
+					write[count][t / 2] = (LCD_POINT_COLOR & 0xFF) << 8 | LCD_POINT_COLOR >> 8;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -263,14 +263,14 @@ void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 				temp <<= 1;
 				y++;
 				if (y >= h) {
-					LCD7735_POINT_COLOR = colortemp;
+					LCD_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD7735_POINT_COLOR = colortemp;
+						LCD_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -280,10 +280,10 @@ void LCD7735_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t
 	}
 	ST7735_FillRGBRect(&st7735_pObj, x0, y0, (uint8_t*) &write,
 			size == 12 ? 6 : 8, size);
-	LCD7735_POINT_COLOR = colortemp;
+	LCD_POINT_COLOR = colortemp;
 }
 
-void LCD7735_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
+void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
 	uint8_t x0 = x;
 	width += x;
 	height += y;
@@ -294,23 +294,23 @@ void LCD7735_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
 		}
 		if (y >= height)
 			break;
-		LCD7735_ShowChar(x, y, *p, size, 0);
+		LCD_ShowChar(x, y, *p, size, 0);
 		x += size / 2;
 		p++;
 	}
 }
 
-static int32_t lcd7735_init(void) {
+static int32_t LCD_init(void) {
 	int32_t result = ST7735_OK;
 	HAL_LPTIM_PWM_Start(LCD_Brightness_timer, LCD_Brightness_channel);
 	return result;
 }
 
-static int32_t lcd7735_gettick(void) {
+static int32_t LCD_gettick(void) {
 	return HAL_GetTick();
 }
 
-static int32_t lcd7735_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
+static int32_t LCD_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
 	int32_t result;
 	LCD_CS_RESET;
 	LCD_RS_RESET;
@@ -323,7 +323,7 @@ static int32_t lcd7735_writereg(uint8_t reg, uint8_t *pdata, uint32_t length) {
 	return result;
 }
 
-static int32_t lcd7735_readreg(uint8_t reg, uint8_t *pdata) {
+static int32_t LCD_readreg(uint8_t reg, uint8_t *pdata) {
 	int32_t result;
 	LCD_CS_RESET;
 	LCD_RS_RESET;
@@ -336,7 +336,7 @@ static int32_t lcd7735_readreg(uint8_t reg, uint8_t *pdata) {
 	return result;
 }
 
-static int32_t lcd7735_senddata(uint8_t *pdata, uint32_t length) {
+static int32_t LCD_senddata(uint8_t *pdata, uint32_t length) {
 	int32_t result;
 	LCD_CS_RESET;
 	result = HAL_SPI_Transmit(SPI_Drv, pdata, length, 100);
@@ -345,7 +345,7 @@ static int32_t lcd7735_senddata(uint8_t *pdata, uint32_t length) {
 	return result;
 }
 
-static int32_t lcd7735_recvdata(uint8_t *pdata, uint32_t length) {
+static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length) {
 	int32_t result;
 	LCD_CS_RESET;
 	result = HAL_SPI_Receive(SPI_Drv, pdata, length, 500);
@@ -354,7 +354,7 @@ static int32_t lcd7735_recvdata(uint8_t *pdata, uint32_t length) {
 	return result;
 }
 
-void LCD7735_Printf(uint8_t x, uint8_t y, const char *text, ...) {
+void LCD_Printf(uint8_t x, uint8_t y, const char *text, ...) {
 	char txt[512] = { 0 };
 	va_list args;
 	va_start(args, text);
@@ -364,15 +364,15 @@ void LCD7735_Printf(uint8_t x, uint8_t y, const char *text, ...) {
 	uint16_t px = 6 * x + 1;
 	uint16_t py = 14 * y + 3;
 
-	LCD7735_ShowString(px, py, ST7735Ctx.Width - px - 1, ST7735Ctx.Height - py - 1,
+	LCD_ShowString(px, py, ST7735Ctx.Width - px - 1, ST7735Ctx.Height - py - 1,
 			12, (uint8_t*) txt);
 }
 
-void LCD7735_Clear() {
-	LCD7735_Light(0, 250);
+void LCD_Clear() {
+	LCD_Light(0, 250);
 
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
 
-	LCD7735_Light(900, 250);
+	LCD_Light(900, 250);
 }
