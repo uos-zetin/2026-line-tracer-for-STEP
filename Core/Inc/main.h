@@ -136,6 +136,8 @@ void Error_Handler(void);
 #define IR_0_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+#define KEY_GPIO_Port GPIOC
+#define KEY_Pin GPIO_PIN_13
 
 /* USER CODE END Private defines */
 

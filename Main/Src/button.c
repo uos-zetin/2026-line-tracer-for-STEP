@@ -120,7 +120,6 @@ void Button_Wait_Release(ButtonHandle_t *btn) {
 	while (HAL_GPIO_ReadPin(btn->port, btn->pin) == btn->active_state);
 }
 
-
 void MX_Button_Init(){
 	Button_Init_Internal(&btn_k, GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 	Button_Init_Internal(&btn_l, GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);

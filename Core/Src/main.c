@@ -29,14 +29,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "st7789_lcd.h"
+#include "st7735_lcd.h"
 #include "button.h"
 #include "menu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define LCD_Printf LCD7789_Printf
+#define LCD_Printf LCD7735_Printf
 
 /* USER CODE END PTD */
 
@@ -134,7 +134,8 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-	LCD7789_Test();
+
+	LCD7735_Test();
 
 	LCD_Printf(0, 0, "Hello world~");
 	while (1) {

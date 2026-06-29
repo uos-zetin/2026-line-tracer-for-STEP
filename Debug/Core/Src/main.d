@@ -45,8 +45,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/i2c.h \
  ../Core/Inc/icache.h ../Core/Inc/lptim.h ../Core/Inc/rng.h \
  ../Core/Inc/spi.h ../Core/Inc/tim.h ../Core/Inc/gpio.h \
- ../Drivers/BSP/ST7789/st7789_lcd.h ../Drivers/BSP/ST7789/fonts.h \
- ../Drivers/BSP/ST7789/st7789.h ../Main/Inc/button.h ../Main/Inc/menu.h
+ ../Drivers/BSP/ST7735/st7735_lcd.h ../Drivers/BSP/ST7735/st7735.h \
+ ../Drivers/BSP/ST7735/st7735_reg.h ../Main/Inc/button.h \
+ ../Main/Inc/menu.h
 ../Core/Inc/main.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal.h:
 ../Core/Inc/stm32h5xx_hal_conf.h:
@@ -100,8 +101,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/spi.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/gpio.h:
-../Drivers/BSP/ST7789/st7789_lcd.h:
-../Drivers/BSP/ST7789/fonts.h:
-../Drivers/BSP/ST7789/st7789.h:
+../Drivers/BSP/ST7735/st7735_lcd.h:
+../Drivers/BSP/ST7735/st7735.h:
+../Drivers/BSP/ST7735/st7735_reg.h:
 ../Main/Inc/button.h:
 ../Main/Inc/menu.h:

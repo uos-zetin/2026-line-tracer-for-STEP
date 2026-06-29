@@ -24,7 +24,7 @@ C_DEPS :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
-Drivers/BSP/ST7789 \
+Drivers/BSP/ST7735 \
 Drivers/BSP/STM32H5xx_Nucleo \
 Drivers/STM32H5xx_HAL_Driver/Src \
 Main/Src \
