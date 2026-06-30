@@ -135,13 +135,11 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-
 	LCD_Test();
-	Sensor_Start();
 	LCD_Printf(0, 0, "Hello world~");
 	while (1) {
-//		Main_Menu();
-		Sensor_Test_Raw();
+		Main_Menu();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

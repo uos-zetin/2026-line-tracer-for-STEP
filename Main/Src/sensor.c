@@ -103,6 +103,9 @@ void Sensor_Test_Raw() {
 				irData.sensorRaw[0], irData.sensorRaw[1], irData.sensorRaw[2],
 				irData.sensorRaw[3], irData.sensorRaw[4], irData.sensorRaw[5],
 				irData.sensorRaw[6], irData.sensorRaw[7]);
+		LCD_Printf(0, 2, "%d", tim6_cnt);
+		LCD_Printf(0, 3, "%d", adc_cnt);
+
 	}
 }
 
