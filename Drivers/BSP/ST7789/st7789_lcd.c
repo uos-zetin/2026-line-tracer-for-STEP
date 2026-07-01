@@ -53,35 +53,6 @@ void LCD_Test(void) {
 	ST7789_RegisterBusIO(&st7789_pObj, &st7789_pIO);
 	ST7789_LCD_Driver.Init(&st7789_pObj, ST7789_FORMAT_RBG565, &ST7789Ctx);
 
-	// 화면을 끄고 검은색으로 초기화
-	ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, 0, ST7789Ctx.Width, ST7789Ctx.Height, BLACK);
-	ST7789_SetBrightness(&st7789_pObj, 0);
-
-	// SD 카드 대신 동작 확인용 텍스트 출력
-	LCD_Printf(0, 0, "ST7789 Init OK!");
-	LCD_Printf(0, 1, "SD Card: Disabled");
-	LCD_Printf(0, 3, "Running Fade Test...");
-
-	uint32_t tick = get_tick();
-
-	// 백라이트 페이드인 효과 및 하단 진행바 애니메이션
-	while (1) {
-		delay_ms(10);
-		uint32_t elapsed = get_tick() - tick;
-
-		if (elapsed <= 1000) {
-			LCD_SetBrightness(elapsed * LCD_BACK_BRIGHT / 1000);
-		} else if (elapsed <= 3000) {
-			LCD_SetBrightness(LCD_BACK_BRIGHT);
-			ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, ST7789Ctx.Height - 5,
-					(elapsed - 1000) * ST7789Ctx.Width / 2000, 5, 0xFFFF);
-		} else if (elapsed > 3000) {
-			break;
-		}
-	}
-
-	// 1번 깜빡이는 효과 후 메인루프로 진행
-	LCD_Light(0, 300);
 	ST7789_LCD_Driver.FillRect(&st7789_pObj, 0, 0, ST7789Ctx.Width, ST7789Ctx.Height, BLACK);
 	LCD_Light(LCD_BACK_BRIGHT, 300);
 }

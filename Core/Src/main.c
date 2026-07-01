@@ -112,7 +112,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-  MX_Button_Init();
+  
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -120,7 +120,6 @@ int main(void)
 
   /* Initialize User push-button without interrupt mode. */
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
-
   /* Initialize COM1 port (115200, 8 bits (7-bit data + 1 stop bit), no parity */
   BspCOMInit.BaudRate   = 115200;
   BspCOMInit.WordLength = COM_WORDLENGTH_8B;
@@ -134,10 +133,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    MX_Button_Init(); // .ioc 재생성 방어: BSP_PB_Init 등 모든 초기화 끝난 직후 덮어쓰기
 
-	LCD_Test();
-	LCD_Printf(0, 0, "Hello world~");
-	while (1) {
+	LCD_Test(); 
+	
+    while (1) {
 		Main_Menu();
 
     /* USER CODE END WHILE */

@@ -66,27 +66,10 @@ void LCD_Test(void) {
 	ST7735_LCD_Driver.ReadID(&st7735_pObj, &st7735_id);
 
 	LCD_SetBrightness(0);
-
 	LCD_Clear();
 
-	uint32_t tick = get_tick();
-	while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) != GPIO_PIN_SET) {
-		delay_ms(10);
-
-		if (get_tick() - tick <= 1000)
-			LCD_SetBrightness((get_tick() - tick) * LCD_BACK_BRIGHT / 1000);
-		else if (get_tick() - tick <= 3000) {
-			sprintf((char*) &text, "%03ld", (get_tick() - tick - 1000) / 10);
-			LCD_ShowString(ST7735Ctx.Width - 20, 1, ST7735Ctx.Width, 12, 12, text);
-			ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, ST7735Ctx.Height - 3,
-					(get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3, 0xFFFF);
-		} else if (get_tick() - tick > 3000)
-			break;
-	}
-	while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) == GPIO_PIN_SET) {
-		delay_ms(10);
-	}
-	LCD_Light(0, 300);
+    // 버튼 입력을 기다리던 기존 while 루프(테스트 로직) 삭제
+    // 바로 화면을 검은색으로 지우고 종료하여 Main_Menu로 빠르게 넘어가게 함
 
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
