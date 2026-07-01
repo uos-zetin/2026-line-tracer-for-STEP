@@ -99,12 +99,12 @@ void Sensor_Calibration() {
 
 void Sensor_Test_Raw() {
 	while (1) {
-		LCD_Printf(0, 1, "%02x %02x %02x %02x %02x %02x %02x %02x",
+		Custom_LCD_Printf("/1/a%02x %02x %02x %02x %02x %02x %02x %02x",
 				irData.sensorRaw[0], irData.sensorRaw[1], irData.sensorRaw[2],
 				irData.sensorRaw[3], irData.sensorRaw[4], irData.sensorRaw[5],
 				irData.sensorRaw[6], irData.sensorRaw[7]);
-		LCD_Printf(0, 2, "%d", tim6_cnt);
-		LCD_Printf(0, 3, "%d", adc_cnt);
+		Custom_LCD_Printf("/2/a%d", tim6_cnt);
+		Custom_LCD_Printf("/3/a%d", adc_cnt);
 
 	}
 }
