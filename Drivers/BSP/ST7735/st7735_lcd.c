@@ -38,7 +38,7 @@ static int32_t LCD_readreg(uint8_t reg, uint8_t *pdata);
 static int32_t LCD_senddata(uint8_t *pdata, uint32_t length);
 static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length);
 
-uint16_t LCD_BACK_BRIGHT = 600;
+uint16_t ST7735_WRAPPER_BACK_BRIGHT = 600;
 
 ST7735_IO_t st7735_pIO = { LCD_init,
 0, 0, LCD_writereg, LCD_readreg, LCD_senddata, LCD_recvdata, LCD_gettick };
@@ -46,7 +46,7 @@ ST7735_IO_t st7735_pIO = { LCD_init,
 ST7735_Object_t st7735_pObj;
 uint32_t st7735_id;
 
-void LCD_Test(void) {
+void ST7735_WRAPPER_Test(void) {
 	uint8_t text[20];
 
 #if defined(TFT96)
@@ -65,8 +65,8 @@ void LCD_Test(void) {
 	ST7735_LCD_Driver.Init(&st7735_pObj, ST7735_FORMAT_RBG565, &ST7735Ctx);
 	ST7735_LCD_Driver.ReadID(&st7735_pObj, &st7735_id);
 
-	LCD_SetBrightness(0);
-	LCD_Clear();
+	ST7735_WRAPPER_SetBrightness(0);
+	ST7735_WRAPPER_Clear();
 
     // 버튼 입력을 기다리던 기존 while 루프(테스트 로직) 삭제
     // 바로 화면을 검은색으로 지우고 종료하여 Main_Menu로 빠르게 넘어가게 함
@@ -74,32 +74,32 @@ void LCD_Test(void) {
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
 
-	LCD_Light(LCD_BACK_BRIGHT, 300);
+	ST7735_WRAPPER_Light(ST7735_WRAPPER_BACK_BRIGHT, 300);
 }
 
-static uint32_t LCD_LightSet;
-static uint8_t IsLCD_SoftPWM = 0;
+static uint32_t ST7735_WRAPPER_LightSet;
+static uint8_t IsST7735_WRAPPER_SoftPWM = 0;
 
-void LCD_SetBrightness(uint32_t Brightness) {
-	LCD_LightSet = Brightness;
-	if (!IsLCD_SoftPWM)
+void ST7735_WRAPPER_SetBrightness(uint32_t Brightness) {
+	ST7735_WRAPPER_LightSet = Brightness;
+	if (!IsST7735_WRAPPER_SoftPWM)
 		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
 }
 
-uint32_t LCD_GetBrightness(void) {
-	if (IsLCD_SoftPWM)
-		return LCD_LightSet;
+uint32_t ST7735_WRAPPER_GetBrightness(void) {
+	if (IsST7735_WRAPPER_SoftPWM)
+		return ST7735_WRAPPER_LightSet;
 	else
 		return (*LCD_Brightness_timer).Instance->CCR2;
 }
 
-void LCD_SoftPWMEnable(uint8_t enable) {
-	IsLCD_SoftPWM = enable;
+void ST7735_WRAPPER_SoftPWMEnable(uint8_t enable) {
+	IsST7735_WRAPPER_SoftPWM = enable;
 	if (!enable)
-		LCD_SetBrightness(LCD_LightSet);
+		ST7735_WRAPPER_SetBrightness(ST7735_WRAPPER_LightSet);
 }
 //
-//void LCD_SoftPWMCtrlInit(void) {
+//void ST7735_WRAPPER_SoftPWMCtrlInit(void) {
 //	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 //
 //	__HAL_RCC_GPIOE_CLK_ENABLE();
@@ -112,15 +112,15 @@ void LCD_SoftPWMEnable(uint8_t enable) {
 //	MX_TIM16_Init(); // Freq: 10K
 //	HAL_TIM_Base_Start_IT(&htim16);
 //
-//	LCD_SoftPWMEnable(1);
+//	ST7735_WRAPPER_SoftPWMEnable(1);
 //}
 //
-//void LCD_SoftPWMCtrlDeInit(void) {
+//void ST7735_WRAPPER_SoftPWMCtrlDeInit(void) {
 //	HAL_TIM_Base_DeInit(&htim16);
 //	HAL_GPIO_DeInit(GPIOE, GPIO_PIN_10);
 //}
 //
-//void LCD_SoftPWMCtrlRun(void) {
+//void ST7735_WRAPPER_SoftPWMCtrlRun(void) {
 //	static uint32_t timecount;
 //
 //	if (timecount > 1000)
@@ -128,7 +128,7 @@ void LCD_SoftPWMEnable(uint8_t enable) {
 //	else
 //		timecount += 10;
 //
-//	if (timecount >= LCD_LightSet)
+//	if (timecount >= ST7735_WRAPPER_LightSet)
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
 //	else
 //		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
@@ -139,17 +139,17 @@ void LCD_SoftPWMEnable(uint8_t enable) {
  */
 // void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 // 	if (htim->Instance == TIM16) {
-// 		LCD_SoftPWMCtrlRun();
+// 		ST7735_WRAPPER_SoftPWMCtrlRun();
 // 	}
 // }
 
-void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
+void ST7735_WRAPPER_Light(uint32_t Brightness_Dis, uint32_t time) {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
 	float temp1, temp2;
 	float k, set;
 
-	Brightness_Now = LCD_GetBrightness();
+	Brightness_Now = ST7735_WRAPPER_GetBrightness();
 	time_now = 0;
 	if (Brightness_Now == Brightness_Dis)
 		return;
@@ -170,20 +170,20 @@ void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
 		time_now = get_tick() - tick;
 		temp2 = time_now - 0;
 		set = temp2 * k + Brightness_Now;
-		LCD_SetBrightness((uint32_t) set);
+		ST7735_WRAPPER_SetBrightness((uint32_t) set);
 		if (time_now >= time)
 			break;
 	}
 }
 
-uint16_t LCD_POINT_COLOR = 0xFFFF;
-uint16_t LCD_BACK_COLOR = BLACK;
+uint16_t ST7735_WRAPPER_POINT_COLOR = 0xFFFF;
+uint16_t ST7735_WRAPPER_BACK_COLOR = BLACK;
 
-void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
+void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
 	uint8_t temp, t1, t;
 	uint16_t y0 = y;
 	uint16_t x0 = x;
-	uint16_t colortemp = LCD_POINT_COLOR;
+	uint16_t colortemp = ST7735_WRAPPER_POINT_COLOR;
 	uint32_t h, w;
 
 	uint16_t write[size][size == 12 ? 6 : 8];
@@ -204,11 +204,11 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					LCD_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
+					ST7735_WRAPPER_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
 				else
-					LCD_POINT_COLOR = (LCD_BACK_COLOR & 0xFF) << 8 | LCD_BACK_COLOR >> 8;
+					ST7735_WRAPPER_POINT_COLOR = (ST7735_WRAPPER_BACK_COLOR & 0xFF) << 8 | ST7735_WRAPPER_BACK_COLOR >> 8;
 
-				write[count][t / 2] = LCD_POINT_COLOR;
+				write[count][t / 2] = ST7735_WRAPPER_POINT_COLOR;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -216,14 +216,14 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 				temp <<= 1;
 				y++;
 				if (y >= h) {
-					LCD_POINT_COLOR = colortemp;
+					ST7735_WRAPPER_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD_POINT_COLOR = colortemp;
+						ST7735_WRAPPER_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -238,7 +238,7 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 				temp = asc2_1608[num][t];
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					write[count][t / 2] = (LCD_POINT_COLOR & 0xFF) << 8 | LCD_POINT_COLOR >> 8;
+					write[count][t / 2] = (ST7735_WRAPPER_POINT_COLOR & 0xFF) << 8 | ST7735_WRAPPER_POINT_COLOR >> 8;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -246,14 +246,14 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 				temp <<= 1;
 				y++;
 				if (y >= h) {
-					LCD_POINT_COLOR = colortemp;
+					ST7735_WRAPPER_POINT_COLOR = colortemp;
 					return;
 				}
 				if ((y - y0) == size) {
 					y = y0;
 					x++;
 					if (x >= w) {
-						LCD_POINT_COLOR = colortemp;
+						ST7735_WRAPPER_POINT_COLOR = colortemp;
 						return;
 					}
 					break;
@@ -263,10 +263,10 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 	}
 	ST7735_FillRGBRect(&st7735_pObj, x0, y0, (uint8_t*) &write,
 			size == 12 ? 6 : 8, size);
-	LCD_POINT_COLOR = colortemp;
+	ST7735_WRAPPER_POINT_COLOR = colortemp;
 }
 
-void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
+void ST7735_WRAPPER_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
 	uint8_t x0 = x;
 	width += x;
 	height += y;
@@ -277,7 +277,7 @@ void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uin
 		}
 		if (y >= height)
 			break;
-		LCD_ShowChar(x, y, *p, size, 0);
+		ST7735_WRAPPER_ShowChar(x, y, *p, size, 0);
 		x += size / 2;
 		p++;
 	}
@@ -337,7 +337,7 @@ static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length) {
 	return result;
 }
 
-void LCD_Printf(uint8_t x, uint8_t y, const char *text, ...) {
+void ST7735_WRAPPER_Printf(uint8_t x, uint8_t y, const char *text, ...) {
 	char txt[512] = { 0 };
 	va_list args;
 	va_start(args, text);
@@ -347,15 +347,15 @@ void LCD_Printf(uint8_t x, uint8_t y, const char *text, ...) {
 	uint16_t px = 6 * x + 1;
 	uint16_t py = 14 * y + 3;
 
-	LCD_ShowString(px, py, ST7735Ctx.Width - px - 1, ST7735Ctx.Height - py - 1,
+	ST7735_WRAPPER_ShowString(px, py, ST7735Ctx.Width - px - 1, ST7735Ctx.Height - py - 1,
 			12, (uint8_t*) txt);
 }
 
-void LCD_Clear() {
-	LCD_Light(0, 250);
+void ST7735_WRAPPER_Clear() {
+	ST7735_WRAPPER_Light(0, 250);
 
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
 
-	LCD_Light(900, 250);
+	ST7735_WRAPPER_Light(900, 250);
 }

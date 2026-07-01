@@ -29,7 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "st7735_lcd.h"
+#include "st7789_lcd.h"
 
 #include "button.h"
 #include "menu.h"
@@ -132,10 +132,8 @@ int main(void)
   }
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+    /* USER CODE BEGIN WHILE */
     MX_Button_Init(); // .ioc 재생성 방어: BSP_PB_Init 등 모든 초기화 끝난 직후 덮어쓰기
-
-	LCD_Test(); 
 	
     while (1) {
 		Main_Menu();
