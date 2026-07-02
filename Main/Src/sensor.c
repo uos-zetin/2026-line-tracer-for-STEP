@@ -63,7 +63,6 @@ void TIM_IR_IRQ_Handler() {
 	__HAL_TIM_CLEAR_FLAG(TIM_SENSOR, TIM_FLAG_UPDATE);
 	__HAL_TIM_ENABLE(TIM_SENSOR);
 	tim6_cnt++;
-//	HAL_ADC_Start(ADC_SENSOR);
 }
 
 void SENSOR_IRQ_Handler() {
@@ -74,7 +73,7 @@ void SENSOR_IRQ_Handler() {
 
 	//calc sensorNormalized, sensorState
 
-	*(irData.sensorRaw + idx) = (uint8_t) (adc_raw >> 4);
+	*(irData.sensorRaw + idx) = (uint8_t) (adc_raw);
 
 	irData.index = (irData.index + 1) & 0x07;
 }

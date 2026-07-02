@@ -112,7 +112,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-  MX_Button_Init();
+	MX_Button_Init();
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -134,12 +134,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
 	LCD_Test();
 	LCD_Printf(0, 0, "Hello world~");
+	Sensor_Start();
 	while (1) {
 		Main_Menu();
-
+		Sensor_Test_Raw();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

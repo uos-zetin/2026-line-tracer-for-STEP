@@ -95,11 +95,13 @@ void LCD_SetBrightness(uint32_t Brightness) {
 		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
 }
 
-uint32_t LCD_GetBrightness(void) {
-	if (IsLCD_SoftPWM)
-		return LCD_LightSet;
-	else
-		return (*LCD_Brightness_timer).Instance->CCR2;
+void LCD_SetBrightness(uint32_t Brightness) {
+	LCD_LightSet = Brightness;
+	if (!IsLCD_SoftPWM) {
+		uint32_t lcd_brightness_max = (*LCD_Brightness_timer).Instance->ARR;
+		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel,
+				lcd_brightness_max - Brightness);
+	}
 }
 
 void LCD_SoftPWMEnable(uint8_t enable) {

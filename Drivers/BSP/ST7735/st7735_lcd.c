@@ -40,8 +40,8 @@ static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length);
 
 uint16_t LCD_BACK_BRIGHT = 600;
 
-ST7735_IO_t st7735_pIO = { LCD_init,
-0, 0, LCD_writereg, LCD_readreg, LCD_senddata, LCD_recvdata, LCD_gettick };
+ST7735_IO_t st7735_pIO = { LCD_init, 0, 0, LCD_writereg, LCD_readreg,
+		LCD_senddata, LCD_recvdata, LCD_gettick };
 
 ST7735_Object_t st7735_pObj;
 uint32_t st7735_id;
@@ -77,9 +77,11 @@ void LCD_Test(void) {
 			LCD_SetBrightness((get_tick() - tick) * LCD_BACK_BRIGHT / 1000);
 		else if (get_tick() - tick <= 3000) {
 			sprintf((char*) &text, "%03ld", (get_tick() - tick - 1000) / 10);
-			LCD_ShowString(ST7735Ctx.Width - 20, 1, ST7735Ctx.Width, 12, 12, text);
+			LCD_ShowString(ST7735Ctx.Width - 20, 1, ST7735Ctx.Width, 12, 12,
+					text);
 			ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, ST7735Ctx.Height - 3,
-					(get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3, 0xFFFF);
+					(get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3,
+					0xFFFF);
 		} else if (get_tick() - tick > 3000)
 			break;
 	}
@@ -99,8 +101,11 @@ static uint8_t IsLCD_SoftPWM = 0;
 
 void LCD_SetBrightness(uint32_t Brightness) {
 	LCD_LightSet = Brightness;
-	if (!IsLCD_SoftPWM)
-		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
+	if (!IsLCD_SoftPWM) {
+		uint32_t lcd_brightness_max = (*LCD_Brightness_timer).Instance->ARR;
+		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel,
+				lcd_brightness_max - Brightness);
+	}
 }
 
 uint32_t LCD_GetBrightness(void) {
@@ -159,7 +164,6 @@ void LCD_SoftPWMEnable(uint8_t enable) {
 // 		LCD_SoftPWMCtrlRun();
 // 	}
 // }
-
 void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
@@ -196,7 +200,8 @@ void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
 uint16_t LCD_POINT_COLOR = 0xFFFF;
 uint16_t LCD_BACK_COLOR = BLACK;
 
-void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
+void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
+		uint8_t mode) {
 	uint8_t temp, t1, t;
 	uint16_t y0 = y;
 	uint16_t x0 = x;
@@ -223,7 +228,8 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 				if (temp & 0x80)
 					LCD_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
 				else
-					LCD_POINT_COLOR = (LCD_BACK_COLOR & 0xFF) << 8 | LCD_BACK_COLOR >> 8;
+					LCD_POINT_COLOR = (LCD_BACK_COLOR & 0xFF) << 8
+							| LCD_BACK_COLOR >> 8;
 
 				write[count][t / 2] = LCD_POINT_COLOR;
 				count++;
@@ -255,7 +261,8 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 				temp = asc2_1608[num][t];
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					write[count][t / 2] = (LCD_POINT_COLOR & 0xFF) << 8 | LCD_POINT_COLOR >> 8;
+					write[count][t / 2] = (LCD_POINT_COLOR & 0xFF) << 8
+							| LCD_POINT_COLOR >> 8;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -283,7 +290,8 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
 	LCD_POINT_COLOR = colortemp;
 }
 
-void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
+void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+		uint8_t size, uint8_t *p) {
 	uint8_t x0 = x;
 	width += x;
 	height += y;
