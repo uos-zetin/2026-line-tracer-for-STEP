@@ -38,8 +38,6 @@ typedef enum {
 typedef enum {
     BTN_STATE_IDLE,
     BTN_STATE_PRESSED,
-    BTN_STATE_WAIT_DOUBLE,
-    BTN_STATE_SECOND_PRESSED,
     BTN_STATE_LONG_PRESS,
     BTN_STATE_WAIT_RELEASE
 } ButtonState_t;

@@ -44,8 +44,8 @@ static ButtonEvent_t Button_Get_Event(ButtonHandle_t *btn) {
         case BTN_STATE_PRESSED:
             if (!is_pressed) {
                 if (now - btn->start_time >= BTN_DEBOUNCE_TIME) {
-                    btn->state = BTN_STATE_WAIT_DOUBLE;
-                    btn->start_time = now;
+                    event = BTN_EVENT_SINGLE_CLICK; // 즉각적으로 싱글 클릭 반환!
+                    btn->state = BTN_STATE_IDLE;
                 } else {
                     btn->state = BTN_STATE_IDLE;
                 }
@@ -53,25 +53,6 @@ static ButtonEvent_t Button_Get_Event(ButtonHandle_t *btn) {
                 btn->state = BTN_STATE_LONG_PRESS;
                 btn->last_repeat_time = now;
                 event = BTN_EVENT_LONG_PRESS_HOLD;
-            }
-            break;
-
-        case BTN_STATE_WAIT_DOUBLE:
-            if (is_pressed) {
-                btn->state = BTN_STATE_SECOND_PRESSED;
-                btn->start_time = now;
-            } else if (now - btn->start_time > BTN_DOUBLE_CLICK_GAP) {
-                event = BTN_EVENT_SINGLE_CLICK;
-                btn->state = BTN_STATE_IDLE;
-            }
-            break;
-
-        case BTN_STATE_SECOND_PRESSED:
-            if (!is_pressed) {
-                if (now - btn->start_time >= BTN_DEBOUNCE_TIME) {
-                    event = BTN_EVENT_DOUBLE_CLICK;
-                }
-                btn->state = BTN_STATE_IDLE;
             }
             break;
 
@@ -121,7 +102,19 @@ void Button_Wait_Release(ButtonHandle_t *btn) {
 }
 
 void MX_Button_Init(){
-	Button_Init_Internal(&btn_k, GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-	Button_Init_Internal(&btn_l, GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-	Button_Init_Internal(&btn_r, GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    // PC13 핀을 강제로 Pull-Up 모드로 덮어쓰기 (Nucleo BSP가 Pull-Down으로 설정한 것을 취소)
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = KEY_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
+
+    // K버튼(가운데 누르기): PC13 핀, 외부 3방향 스위치 모듈에 맞춰 Active LOW (RESET)로 설정
+    Button_Init_Internal(&btn_k, KEY_GPIO_Port, KEY_Pin, GPIO_PIN_RESET);
+    
+    // L버튼(왼쪽): PC6 핀, Active LOW (RESET)
+    Button_Init_Internal(&btn_l, SWL_GPIO_Port, SWL_Pin, GPIO_PIN_RESET);
+    
+    // R버튼(오른쪽): PC8 핀, Active LOW (RESET)
+    Button_Init_Internal(&btn_r, SWR_GPIO_Port, SWR_Pin, GPIO_PIN_RESET);
 }

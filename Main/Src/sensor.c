@@ -63,6 +63,7 @@ void TIM_IR_IRQ_Handler() {
 	__HAL_TIM_CLEAR_FLAG(TIM_SENSOR, TIM_FLAG_UPDATE);
 	__HAL_TIM_ENABLE(TIM_SENSOR);
 	tim6_cnt++;
+//	HAL_ADC_Start(ADC_SENSOR);
 }
 
 void SENSOR_IRQ_Handler() {
@@ -73,7 +74,7 @@ void SENSOR_IRQ_Handler() {
 
 	//calc sensorNormalized, sensorState
 
-	*(irData.sensorRaw + idx) = (uint8_t) (adc_raw);
+	*(irData.sensorRaw + idx) = (uint8_t) (adc_raw >> 4);
 
 	irData.index = (irData.index + 1) & 0x07;
 }
@@ -98,12 +99,7 @@ void Sensor_Calibration() {
 
 void Sensor_Test_Raw() {
 	while (1) {
-		LCD_Printf(0, 1, "%02x %02x %02x %02x %02x %02x %02x %02x",
-				irData.sensorRaw[0], irData.sensorRaw[1], irData.sensorRaw[2],
-				irData.sensorRaw[3], irData.sensorRaw[4], irData.sensorRaw[5],
-				irData.sensorRaw[6], irData.sensorRaw[7]);
-		LCD_Printf(0, 2, "%d", tim6_cnt);
-		LCD_Printf(0, 3, "%d", adc_cnt);
+
 
 	}
 }
