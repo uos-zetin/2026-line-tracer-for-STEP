@@ -131,7 +131,7 @@ void ST7789_WRAPPER_Light(uint32_t Brightness_Dis, uint32_t time) {
 	temp2 = time_now;
 	temp2 = temp2 - time;
 
-	k = temp1 / temp2;
+	k = -temp1 / temp2;
 
 	uint32_t tick = get_tick();
 	while (1) {

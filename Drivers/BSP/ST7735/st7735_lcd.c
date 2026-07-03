@@ -40,8 +40,8 @@ static int32_t LCD_recvdata(uint8_t *pdata, uint32_t length);
 
 uint16_t ST7735_WRAPPER_BACK_BRIGHT = 600;
 
-ST7735_IO_t st7735_pIO = { LCD_init,
-0, 0, LCD_writereg, LCD_readreg, LCD_senddata, LCD_recvdata, LCD_gettick };
+ST7735_IO_t st7735_pIO = { LCD_init, 0, 0, LCD_writereg, LCD_readreg,
+		LCD_senddata, LCD_recvdata, LCD_gettick };
 
 ST7735_Object_t st7735_pObj;
 uint32_t st7735_id;
@@ -68,8 +68,8 @@ void ST7735_WRAPPER_Test(void) {
 	ST7735_WRAPPER_SetBrightness(0);
 	ST7735_WRAPPER_Clear();
 
-    // 버튼 입력을 기다리던 기존 while 루프(테스트 로직) 삭제
-    // 바로 화면을 검은색으로 지우고 종료하여 Main_Menu로 빠르게 넘어가게 함
+	// 버튼 입력을 기다리던 기존 while 루프(테스트 로직) 삭제
+	// 바로 화면을 검은색으로 지우고 종료하여 Main_Menu로 빠르게 넘어가게 함
 
 	ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
 			ST7735Ctx.Height, BLACK);
@@ -83,9 +83,8 @@ static uint8_t IsST7735_WRAPPER_SoftPWM = 0;
 void ST7735_WRAPPER_SetBrightness(uint32_t Brightness) {
 	ST7735_WRAPPER_LightSet = Brightness;
 	if (!IsST7735_WRAPPER_SoftPWM) {
-		uint32_t lcd_brightness_max = (*LCD_Brightness_timer).Instance->ARR;
 		__HAL_LPTIM_COMPARE_SET(LCD_Brightness_timer, LCD_Brightness_channel,
-				lcd_brightness_max - Brightness);
+				Brightness);
 	}
 }
 
@@ -145,7 +144,6 @@ void ST7735_WRAPPER_SoftPWMEnable(uint8_t enable) {
 // 		ST7735_WRAPPER_SoftPWMCtrlRun();
 // 	}
 // }
-
 void ST7735_WRAPPER_Light(uint32_t Brightness_Dis, uint32_t time) {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
@@ -165,7 +163,7 @@ void ST7735_WRAPPER_Light(uint32_t Brightness_Dis, uint32_t time) {
 	temp2 = time_now;
 	temp2 = temp2 - time;
 
-	k = temp1 / temp2;
+	k = -temp1 / temp2;
 
 	uint32_t tick = get_tick();
 	while (1) {
@@ -182,7 +180,8 @@ void ST7735_WRAPPER_Light(uint32_t Brightness_Dis, uint32_t time) {
 uint16_t ST7735_WRAPPER_POINT_COLOR = 0xFFFF;
 uint16_t ST7735_WRAPPER_BACK_COLOR = BLACK;
 
-void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
+void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
+		uint8_t mode) {
 	uint8_t temp, t1, t;
 	uint16_t y0 = y;
 	uint16_t x0 = x;
@@ -207,9 +206,11 @@ void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, 
 
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					ST7735_WRAPPER_POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
+					ST7735_WRAPPER_POINT_COLOR = (colortemp & 0xFF) << 8
+							| colortemp >> 8;
 				else
-					ST7735_WRAPPER_POINT_COLOR = (ST7735_WRAPPER_BACK_COLOR & 0xFF) << 8 | ST7735_WRAPPER_BACK_COLOR >> 8;
+					ST7735_WRAPPER_POINT_COLOR = (ST7735_WRAPPER_BACK_COLOR
+							& 0xFF) << 8 | ST7735_WRAPPER_BACK_COLOR >> 8;
 
 				write[count][t / 2] = ST7735_WRAPPER_POINT_COLOR;
 				count++;
@@ -241,7 +242,8 @@ void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, 
 				temp = asc2_1608[num][t];
 			for (t1 = 0; t1 < 8; t1++) {
 				if (temp & 0x80)
-					write[count][t / 2] = (ST7735_WRAPPER_POINT_COLOR & 0xFF) << 8 | ST7735_WRAPPER_POINT_COLOR >> 8;
+					write[count][t / 2] = (ST7735_WRAPPER_POINT_COLOR & 0xFF)
+							<< 8 | ST7735_WRAPPER_POINT_COLOR >> 8;
 				count++;
 				if (count >= size)
 					count = 0;
@@ -269,7 +271,8 @@ void ST7735_WRAPPER_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, 
 	ST7735_WRAPPER_POINT_COLOR = colortemp;
 }
 
-void ST7735_WRAPPER_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, uint8_t *p) {
+void ST7735_WRAPPER_ShowString(uint16_t x, uint16_t y, uint16_t width,
+		uint16_t height, uint8_t size, uint8_t *p) {
 	uint8_t x0 = x;
 	width += x;
 	height += y;
@@ -350,8 +353,8 @@ void ST7735_WRAPPER_Printf(uint8_t x, uint8_t y, const char *text, ...) {
 	uint16_t px = 6 * x + 1;
 	uint16_t py = 14 * y + 3;
 
-	ST7735_WRAPPER_ShowString(px, py, ST7735Ctx.Width - px - 1, ST7735Ctx.Height - py - 1,
-			12, (uint8_t*) txt);
+	ST7735_WRAPPER_ShowString(px, py, ST7735Ctx.Width - px - 1,
+			ST7735Ctx.Height - py - 1, 12, (uint8_t*) txt);
 }
 
 void ST7735_WRAPPER_Clear() {
