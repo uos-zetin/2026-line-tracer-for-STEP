@@ -14,7 +14,7 @@
 
 typedef struct {
 	char name[16];
-	void *func;
+	void (*func)(void);
 } Menu_TypeDef;
 
 Menu_TypeDef MENU = {
