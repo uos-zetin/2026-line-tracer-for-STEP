@@ -10,6 +10,7 @@
 #include "main.h"
 #include "tim.h"
 #include "gpio.h"
+#include "dac.h"
 
 #define TIM_MOTOR_L &htim1
 #define TIM_MOTOR_R &htim8
@@ -68,12 +69,16 @@ __STATIC_INLINE uint16_t Calc_ARR(TIM_TypeDef *htim, float_t velocity){
 }
 
 void Motor_Start(){
+	HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 2048);
 	HAL_TIM_Base_Start_IT(TIM_MOTOR_L);
 	HAL_TIM_Base_Start_IT(TIM_MOTOR_R);
 }
 
 
 void Motor_Stop() {
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+	HAL_DAC_Stop(&hdac1, DAC_CHANNEL_2);
 	HAL_TIM_Base_Stop_IT(TIM_MOTOR_L);
 	HAL_TIM_Base_Stop_IT(TIM_MOTOR_R);
 }

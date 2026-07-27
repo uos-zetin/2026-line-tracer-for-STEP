@@ -22,6 +22,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_ll_adc.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc_ex.h \
+ ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_dac.h \
+ ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_dac_ex.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash_ex.h \
  ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_i2c.h \
@@ -42,7 +44,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/BSP/STM32H5xx_Nucleo/stm32h5xx_nucleo.h \
  ../Core/Inc/stm32h5xx_nucleo_conf.h \
  ../Drivers/BSP/STM32H5xx_Nucleo/stm32h5xx_nucleo_errno.h \
- ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/i2c.h \
+ ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/dac.h ../Core/Inc/i2c.h \
  ../Core/Inc/icache.h ../Core/Inc/lptim.h ../Core/Inc/rng.h \
  ../Core/Inc/spi.h ../Core/Inc/tim.h ../Core/Inc/gpio.h \
  ../Drivers/BSP/ST7789/st7789_lcd.h ../Drivers/BSP/ST7789/fonts.h \
@@ -72,6 +74,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_ll_adc.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc_ex.h:
+../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_dac.h:
+../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_dac_ex.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_flash_ex.h:
 ../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_i2c.h:
@@ -94,6 +98,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/BSP/STM32H5xx_Nucleo/stm32h5xx_nucleo_errno.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
+../Core/Inc/dac.h:
 ../Core/Inc/i2c.h:
 ../Core/Inc/icache.h:
 ../Core/Inc/lptim.h:
