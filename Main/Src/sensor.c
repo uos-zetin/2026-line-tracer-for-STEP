@@ -40,9 +40,9 @@ IR_DATA irData;
 IR_TypeDef IR_Index[SENSOR_NUM] = { { .Port = IR_0_GPIO_Port, .Pin = IR_0_Pin },
 		{ .Port = IR_1_GPIO_Port, .Pin = IR_1_Pin }, { .Port = IR_2_GPIO_Port,
 				.Pin = IR_2_Pin }, { .Port = IR_3_GPIO_Port, .Pin = IR_3_Pin },
-		{ .Port = IR_4_GPIO_Port, .Pin = IR_4_Pin }, { .Port = IR_5_GPIO_Port,
-				.Pin = IR_5_Pin }, { .Port = IR_6_GPIO_Port, .Pin = IR_6_Pin },
-		{ .Port = IR_7_GPIO_Port, .Pin = IR_7_Pin }, };
+		{ .Port = IR_3_GPIO_Port, .Pin = IR_3_Pin }, { .Port = IR_2_GPIO_Port,
+				.Pin = IR_2_Pin }, { .Port = IR_1_GPIO_Port, .Pin = IR_1_Pin },
+		{ .Port = IR_0_GPIO_Port, .Pin = IR_0_Pin }, };
 
 volatile uint32_t tim6_cnt = 0;
 volatile uint32_t adc_cnt = 0;

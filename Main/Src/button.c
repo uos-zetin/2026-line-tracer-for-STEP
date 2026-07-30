@@ -106,15 +106,15 @@ void MX_Button_Init(){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     GPIO_InitStruct.Pin = KEY_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
 
     // K버튼(가운데 누르기): PC13 핀, 외부 3방향 스위치 모듈에 맞춰 Active LOW (RESET)로 설정
-    Button_Init_Internal(&btn_k, KEY_GPIO_Port, KEY_Pin, GPIO_PIN_RESET);
+    Button_Init_Internal(&btn_k, KEY_GPIO_Port, KEY_Pin, GPIO_PIN_SET);
     
     // L버튼(왼쪽): PC6 핀, Active LOW (RESET)
-    Button_Init_Internal(&btn_l, SWL_GPIO_Port, SWL_Pin, GPIO_PIN_RESET);
+    Button_Init_Internal(&btn_l, SWL_GPIO_Port, SWL_Pin, GPIO_PIN_SET);
     
     // R버튼(오른쪽): PC8 핀, Active LOW (RESET)
-    Button_Init_Internal(&btn_r, SWR_GPIO_Port, SWR_Pin, GPIO_PIN_RESET);
+    Button_Init_Internal(&btn_r, SWR_GPIO_Port, SWR_Pin, GPIO_PIN_SET);
 }
